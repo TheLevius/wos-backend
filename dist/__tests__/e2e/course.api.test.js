@@ -29,6 +29,7 @@ describe('/courses', () => {
             .expect(src_1.HTTP_STATUSES.NOT_FOUND_404);
     }));
     it(`should'nt create course with incorrect input data`, () => __awaiter(void 0, void 0, void 0, function* () {
+        const data = { title: 'it-incubator course' };
         yield (0, supertest_1.default)(src_1.app)
             .post('/courses')
             .send({ title: '' })
@@ -51,14 +52,15 @@ describe('/courses', () => {
     }));
     let createdCourse2 = null;
     it(`create one more course`, () => __awaiter(void 0, void 0, void 0, function* () {
+        const data = { title: 'it-incubator course 2' };
         const response = yield (0, supertest_1.default)(src_1.app)
             .post('/courses')
-            .send({ title: 'it-incubator test 2' })
+            .send(data)
             .expect(src_1.HTTP_STATUSES.CREATED_201);
         createdCourse2 = response.body;
         expect(createdCourse2).toEqual({
             id: expect.any(Number),
-            title: 'it-incubator test 2'
+            title: data.title
         });
         yield (0, supertest_1.default)(src_1.app)
             .get('/courses')
@@ -66,9 +68,10 @@ describe('/courses', () => {
     }));
     it(`should'nt update course with incorrect input data`, () => __awaiter(void 0, void 0, void 0, function* () {
         var _a, _b;
+        const data = { title: '' };
         yield (0, supertest_1.default)(src_1.app)
             .put(`/courses/${(_a = createdCourse1 === null || createdCourse1 === void 0 ? void 0 : createdCourse1.id) !== null && _a !== void 0 ? _a : ''}`)
-            .send({ title: '' })
+            .send(data)
             .expect(src_1.HTTP_STATUSES.BAD_REQUEST_400);
         yield (0, supertest_1.default)(src_1.app)
             .get(`/courses/${(_b = createdCourse1 === null || createdCourse1 === void 0 ? void 0 : createdCourse1.id) !== null && _b !== void 0 ? _b : ''}`)
@@ -82,13 +85,14 @@ describe('/courses', () => {
     }));
     it(`should update course with correct input data`, () => __awaiter(void 0, void 0, void 0, function* () {
         var _c, _d, _e;
+        const data = { title: 'good new title' };
         yield (0, supertest_1.default)(src_1.app)
             .put(`/courses/${(_c = createdCourse1 === null || createdCourse1 === void 0 ? void 0 : createdCourse1.id) !== null && _c !== void 0 ? _c : ''}`)
-            .send({ title: 'good new title' })
+            .send(data)
             .expect(src_1.HTTP_STATUSES.OK_200);
         yield (0, supertest_1.default)(src_1.app)
             .get(`/courses/${(_d = createdCourse1 === null || createdCourse1 === void 0 ? void 0 : createdCourse1.id) !== null && _d !== void 0 ? _d : ''}`)
-            .expect(src_1.HTTP_STATUSES.OK_200, Object.assign(Object.assign({}, createdCourse1), { title: 'good new title' }));
+            .expect(src_1.HTTP_STATUSES.OK_200, Object.assign(Object.assign({}, createdCourse1), { title: data.title }));
         yield (0, supertest_1.default)(src_1.app)
             .get(`/courses/${(_e = createdCourse2 === null || createdCourse2 === void 0 ? void 0 : createdCourse2.id) !== null && _e !== void 0 ? _e : ''}`)
             .expect(src_1.HTTP_STATUSES.OK_200, createdCourse2);

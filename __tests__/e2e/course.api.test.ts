@@ -1,5 +1,7 @@
 import request from 'supertest';
 import {app, HTTP_STATUSES} from '../../src';
+import {CreateCourseModel} from "../../src/models/CreateCourseModel";
+import {UpdateCourseModel} from "../../src/models/UpdateCourseModel";
 
 type CourseItem = {
     id: number;
@@ -20,6 +22,8 @@ describe('/courses', () => {
             .expect(HTTP_STATUSES.NOT_FOUND_404)
     });
     it(`should'nt create course with incorrect input data`, async () => {
+        const data: CreateCourseModel = { title: 'it-incubator course' }
+
         await request(app)
             .post('/courses')
             .send({ title: ''})
@@ -46,17 +50,17 @@ describe('/courses', () => {
     });
     let createdCourse2: CourseItem = null;
     it(`create one more course`, async () => {
-
+        const data: CreateCourseModel = { title: 'it-incubator course 2' }
         const response = await request(app)
             .post('/courses')
-            .send({ title: 'it-incubator test 2'})
+            .send(data)
             .expect(HTTP_STATUSES.CREATED_201);
 
         createdCourse2 = response.body;
 
         expect(createdCourse2).toEqual({
             id: expect.any(Number),
-            title: 'it-incubator test 2'
+            title: data.title
         })
         await request(app)
             .get('/courses')
@@ -65,9 +69,11 @@ describe('/courses', () => {
 
     it(`should'nt update course with incorrect input data`, async () => {
 
+        const data: CreateCourseModel = { title: '' }
+
         await request(app)
             .put(`/courses/${createdCourse1?.id ?? ''}`)
-            .send({ title: ''})
+            .send(data)
             .expect(HTTP_STATUSES.BAD_REQUEST_400)
 
 
@@ -85,16 +91,18 @@ describe('/courses', () => {
     });
     it(`should update course with correct input data`, async () => {
 
+        const data: UpdateCourseModel = { title: 'good new title' }
+
         await request(app)
             .put(`/courses/${createdCourse1?.id ?? ''}`)
-            .send({ title: 'good new title'})
+            .send(data)
             .expect(HTTP_STATUSES.OK_200)
 
         await request(app)
             .get(`/courses/${createdCourse1?.id ?? ''}`)
             .expect(HTTP_STATUSES.OK_200, {
                 ...createdCourse1,
-                title: 'good new title'
+                title: data.title
             })
         await request(app)
             .get(`/courses/${createdCourse2?.id ?? ''}`)
